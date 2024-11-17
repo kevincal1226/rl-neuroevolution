@@ -10,10 +10,19 @@ Original file is located at
 import random
 import string
 
+
 def randomChar() -> str:
     """Returns a random character."""
-    dictionary = string.ascii_letters + string.ascii_lowercase + string.ascii_uppercase + string.digits + string.punctuation + ' '
+    dictionary = (
+        string.ascii_letters
+        + string.ascii_lowercase
+        + string.ascii_uppercase
+        + string.digits
+        + string.punctuation
+        + " "
+    )
     return random.choice(dictionary)
+
 
 """## Chromosome Class
 For monkey typewriter, the genes of each chromosome is an array of characters which represent a word.
@@ -24,6 +33,7 @@ Each chromsome keeps track of a live fitness score which represents how accurate
 
 """
 
+
 class Chromosome:
     def __init__(self, num_genes: int, mutation_rate: float):
         self.genes = []
@@ -32,58 +42,63 @@ class Chromosome:
 
         #  TODO: INIT Genes array with random genes
         for _ in range(num_genes):
-          self.genes.append(randomChar())
+            self.genes.append(randomChar())
 
     def mutate(self) -> None:
         """
-            Randomly mutate each gene in the self.genes
-            with a probability of self.mutation_rate.
+        Randomly mutate each gene in the self.genes
+        with a probability of self.mutation_rate.
 
-            Mutate by replacing the gene with a random character.
+        Mutate by replacing the gene with a random character.
         """
         # TODO: Implement me
         for i in range(len(self.genes)):
-          if random.random() < self.mutation_rate:
-            self.genes[i] = randomChar()
+            if random.random() < self.mutation_rate:
+                self.genes[i] = randomChar()
 
     def getChromosome(self) -> str:
         """
-            Return the current chromosome as a string instead of list of chars.
+        Return the current chromosome as a string instead of list of chars.
         """
         return "".join(self.genes)
 
+
 """### Fitness and crossover functions"""
+
 
 def calc_fitness(chromosome: Chromosome, target: str) -> None:
     """
-        Given a target phrase, calculate how similar the current chromosome is.
-        Store the similarity metric in self.cur_fitness_score as a percentage.
+    Given a target phrase, calculate how similar the current chromosome is.
+    Store the similarity metric in self.cur_fitness_score as a percentage.
 
-        In this case, similarity is defined as #correct / #total (same as challenge)
+    In this case, similarity is defined as #correct / #total (same as challenge)
 
-        E.G: Target="APPLE", self.genes="AXPLG"
-        We would calculate this score as 3 correct / 5 total = 0.6
+    E.G: Target="APPLE", self.genes="AXPLG"
+    We would calculate this score as 3 correct / 5 total = 0.6
     """
     # TODO: Implement me (hint: similar to challenge in toy ga)
-    assert(len(chromosome.genes) == len(target))
+    assert len(chromosome.genes) == len(target)
     current = 0
     total = len(target)
     for char, correct in zip(chromosome.genes, target):
-      if char == correct:
-        current += 1
+        if char == correct:
+            current += 1
 
     chromosome.fitness_score = current / total
 
-def partition_crossover(parentA: Chromosome, parentB: Chromosome, mutationRate: float) -> Chromosome:
+
+def partition_crossover(
+    parentA: Chromosome, parentB: Chromosome, mutationRate: float
+) -> Chromosome:
     """
-        Given two parents, combine them to create a child.
-        Uses Partition strategy:
-          1) Randomly select an index i on range(0, n) to partition on
-          2) Take ParentA genes from [0, i]
-          3) Take ParentB genes from [i, n]
-          4) Combine to make child of length n
+    Given two parents, combine them to create a child.
+    Uses Partition strategy:
+      1) Randomly select an index i on range(0, n) to partition on
+      2) Take ParentA genes from [0, i]
+      3) Take ParentB genes from [i, n]
+      4) Combine to make child of length n
     """
-    assert(len(parentA.genes) == len(parentB.genes))
+    assert len(parentA.genes) == len(parentB.genes)
     n = len(parentA.genes)
 
     # TODO: Implement partition crossover here
@@ -92,34 +107,39 @@ def partition_crossover(parentA: Chromosome, parentB: Chromosome, mutationRate: 
     new_chromosome = Chromosome(len(parentA.genes), mutationRate)
     new_chromosome.genes = new_genes
     if random.random() < mutationRate:
-      new_chromosome.mutate()
+        new_chromosome.mutate()
     return new_chromosome
 
-def uniform_crossover(parentA: Chromosome, parentB: Chromosome, mutationRate: float) -> Chromosome:
+
+def uniform_crossover(
+    parentA: Chromosome, parentB: Chromosome, mutationRate: float
+) -> Chromosome:
     """
-        Given two parents, combine them to create a child.
-        Uses Uniform selection strategy:
-          1) For each index i on range(0,n), do the following:
-             - randomly select between ParentA and ParentB genes with equal probability
-             - add selected genes to child
-          2) Child should be size n
+    Given two parents, combine them to create a child.
+    Uses Uniform selection strategy:
+      1) For each index i on range(0,n), do the following:
+         - randomly select between ParentA and ParentB genes with equal probability
+         - add selected genes to child
+      2) Child should be size n
     """
-    assert(len(parentA.genes) == len(parentB.genes))
+    assert len(parentA.genes) == len(parentB.genes)
     n = len(parentA.genes)
 
     # TODO: implement uniform crossover here
     new_genes = []
-    for a,b in zip(parentA.genes, parentB.genes):
-      if random.random() < 0.5:
-        new_genes.append(a)
-      else:
-        new_genes.append(b)
+    for a, b in zip(parentA.genes, parentB.genes):
+        if random.random() < 0.5:
+            new_genes.append(a)
+        else:
+            new_genes.append(b)
 
     new_chromosome = Chromosome(len(parentB.genes), mutationRate)
     new_chromosome.genes = new_genes
     return new_chromosome
 
+
 """### Use this to test your chromosome implementaion before moving on!!!"""
+
 
 def test_chromosome():
     CHROM_SIZE = 15
@@ -130,7 +150,9 @@ def test_chromosome():
 
     # Test create chromosome
     chrom = Chromosome(CHROM_SIZE, MUTATION_RATE)
-    print(f"Created chromosome of length {CHROM_SIZE}, mutation rate {MUTATION_RATE} with genes: '{chrom.getChromosome()}'")
+    print(
+        f"Created chromosome of length {CHROM_SIZE}, mutation rate {MUTATION_RATE} with genes: '{chrom.getChromosome()}'"
+    )
 
     # Test mutate chromosome
     chrom.mutate()
@@ -141,19 +163,34 @@ def test_chromosome():
     print(f"Mutated chromosome, new genes: '{chrom.getChromosome()}'")
 
     # Test crossover
-    parentb = Chromosome(CHROM_SIZE, MUTATION_RATE) # Create parent B
+    parentb = Chromosome(CHROM_SIZE, MUTATION_RATE)  # Create parent B
     child = crossover(chrom, parentb, MUTATION_RATE)
-    print(f"Crossed over chromosomes '{chrom.getChromosome()}' and '{parentb.getChromosome()}', resulting child: '{child.getChromosome()}'")
+    print(
+        f"Crossed over chromosomes '{chrom.getChromosome()}' and '{parentb.getChromosome()}', resulting child: '{child.getChromosome()}'"
+    )
 
     # Test fitness
     fitness(child, TARGET_STRING)
-    print(f"Evaluated Child Fitness on target: '{TARGET_STRING}', fitness score is: {child.fitness_score}")
+    print(
+        f"Evaluated Child Fitness on target: '{TARGET_STRING}', fitness score is: {child.fitness_score}"
+    )
+
+
 test_chromosome()
 
 """# GA Class"""
 
+
 class GA:
-    def __init__(self, mutationRate: float, popSize: int, targetString: str, fitness, crossover, targetScore=1) -> None:
+    def __init__(
+        self,
+        mutationRate: float,
+        popSize: int,
+        targetString: str,
+        fitness,
+        crossover,
+        targetScore=1,
+    ) -> None:
         # Parameters
         self.mutation_rate = mutationRate
         self.population_size = popSize
@@ -173,22 +210,24 @@ class GA:
 
         # TODO: Fill the population array with Chromosomes below
         for _ in range(self.population_size):
-          self.population.append(Chromosome(len(self.target_string), self.mutation_rate))
+            self.population.append(
+                Chromosome(len(self.target_string), self.mutation_rate)
+            )
 
         self.calcFitness()
 
     def calcFitness(self) -> None:
         """
-            Recalculates the fitness values for each chromosome in our population.
+        Recalculates the fitness values for each chromosome in our population.
         """
         # TODO: Replace me
         for chrom in self.population:
-          self.fitness(chrom, self.target_string)
+            self.fitness(chrom, self.target_string)
 
     def selection(self) -> None:
         """
-            Sets the weights of which weight_i represent the probability of chromosome_i being selected.
-            Uses __rouletteScore function to calculate the weights for each chromosome.
+        Sets the weights of which weight_i represent the probability of chromosome_i being selected.
+        Uses __rouletteScore function to calculate the weights for each chromosome.
         """
         self.selection_weights.clear()
         # TODO: Fill self.selection_weights with the corresponding weight for each chromosome
@@ -196,47 +235,56 @@ class GA:
         self.calcFitness()
         total_fitness = 0.0
         for chrom in self.population:
-          total_fitness += chrom.fitness_score
+            total_fitness += chrom.fitness_score
         for i in range(self.population_size):
-          self.selection_weights.append(self.__rouletteScore(self.population[i],total_fitness))
+            self.selection_weights.append(
+                self.__rouletteScore(self.population[i], total_fitness)
+            )
 
-    def __rouletteScore(self, chromosome: Chromosome, total_fitness: float) -> float:
+    def __rouletteScore(
+        self, chromosome: Chromosome, total_fitness: float
+    ) -> float:
         """
-            Per https://en.wikipedia.org/wiki/Selection_(genetic_algorithm),
-            Probability of choosing chromosome i is equal to Fitness of i / total Fitness of all chromosomes
+        Per https://en.wikipedia.org/wiki/Selection_(genetic_algorithm),
+        Probability of choosing chromosome i is equal to Fitness of i / total Fitness of all chromosomes
         """
         return chromosome.fitness_score / total_fitness
 
     def evolve(self):
         """
-            Evolve the current generation, populating the new generation
-            by crossing over random parents from the original generation
-            Parents to the children are chosen through selection criteria listed in self.select().
+        Evolve the current generation, populating the new generation
+        by crossing over random parents from the original generation
+        Parents to the children are chosen through selection criteria listed in self.select().
         """
         next_gen = []
         for i in range(self.population_size):
-            parentA, parentB = random.choices(self.population, self.selection_weights, k=2) # Select two parents based on odds defined in selection()
+            parentA, parentB = random.choices(
+                self.population, self.selection_weights, k=2
+            )  # Select two parents based on odds defined in selection()
             # TODO: Crossover the selected parents to create a child and populate next gen here
-            next_gen.append(self.crossover(parentA, parentB, self.mutation_rate))
+            next_gen.append(
+                self.crossover(parentA, parentB, self.mutation_rate)
+            )
 
         self.generation += 1
         self.population = next_gen
 
     def bestGenome(self) -> Chromosome:
         """
-            Returns the chromsome with the highest current fitness score.
-            If the fitness score achieves our target, mark the GA as done to end the process.
+        Returns the chromsome with the highest current fitness score.
+        If the fitness score achieves our target, mark the GA as done to end the process.
         """
         best = self.population[0]
 
         # TODO: Find the Chromsome in self.populations with the highest fitness score here
         for chrom in self.population:
-          if chrom.fitness_score > best.fitness_score:
-            best = chrom
+            if chrom.fitness_score > best.fitness_score:
+                best = chrom
 
         if best.fitness_score >= self.target_score:
             self.done = True
         return best
+
 
 """# Main GA Loop"""
 
@@ -244,8 +292,8 @@ class GA:
 # Should take less than ~100 generations to output correct word (depends target str length)
 
 MUTATION_RATE = 0.2
-POP_SIZE = 200
-TARGET_STRING = "Hello World..."
+POP_SIZE = 2000
+TARGET_STRING = "penis"
 
 crossover = partition_crossover
 fitness = calc_fitness
@@ -260,3 +308,4 @@ while not ga.done:
     print(f"Gen {ga.generation} \t Result: '{ga.bestGenome().getChromosome()}'")
 
 ""
+
